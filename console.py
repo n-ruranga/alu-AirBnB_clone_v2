@@ -31,15 +31,60 @@ class HBNBCommand(cmd.Cmd):
                  'Review': Review}
 
     def do_create(self, arg):
-        """Create command to create an instance/object of a class"""
+        """Create an instance with optional parameters: create Class key=value ...
+
+        Strings must be in double quotes; underscores are converted to spaces.
+        Floats contain a dot, integers contain only digits.
+        Invalid params are skipped.
+        """
         if not arg:
             print("** class name missing **")
-        elif arg not in HBNBCommand.className.keys():
+            return
+        parts = shlex.split(arg)
+        class_name = parts[0]
+        if class_name not in HBNBCommand.className.keys():
             print("** class doesn't exist **")
-        else:
-            obj = HBNBCommand.className[arg]()
-            HBNBCommand.className[arg].save(obj)
-            print(obj.id)
+            return
+        obj = HBNBCommand.className[class_name]()
+
+        def cast_value(val):
+            # Try int
+            try:
+                if val.isdigit():
+                    return int(val)
+            except AttributeError:
+                pass
+            # Try float
+            try:
+                if val.replace('.', '', 1).isdigit() and val.count('.') == 1:
+                    return float(val)
+            except AttributeError:
+                pass
+            # String: replace underscores with spaces
+            if isinstance(val, str):
+                return val.replace('_', ' ')
+            return val
+
+        for token in parts[1:]:
+            if '=' not in token:
+                continue
+            key, value = token.split('=', 1)
+            if not key:
+                continue
+            # If quoted string, keep inner content and unescape quotes
+            if len(value) >= 2 and value[0] == '"' and value[-1] == '"':
+                inner = value[1:-1].replace('\\"', '"')
+                setattr(obj, key, inner.replace('_', ' '))
+                continue
+            # Otherwise attempt numeric cast or underscore-space conversion
+            casted = cast_value(value)
+            try:
+                setattr(obj, key, casted)
+            except Exception:
+                continue
+
+        obj.save()
+        print(obj.id)
 
     def do_show(self, arg):
         """Show command to print the string representation of an instance"""

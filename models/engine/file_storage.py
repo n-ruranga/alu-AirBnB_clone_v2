@@ -28,9 +28,27 @@ class FileStorage:
                  'Place': Place,
                  'Review': Review}
 
-    def all(self):
-        """Return all stored objects"""
-        return FileStorage.__objects
+    def all(self, cls=None):
+        """Return all stored objects, optionally filtered by class.
+
+        Args:
+            cls: Optional class or class name to filter results.
+
+        Returns:
+            dict mapping keys to objects. If cls is provided, only
+            objects of that class are returned.
+        """
+        if cls is None:
+            return FileStorage.__objects
+        # Accept both class objects and class name strings
+        cls_name = cls if isinstance(cls, str) else getattr(cls, "__name__", None)
+        if cls_name is None:
+            return FileStorage.__objects
+        filtered = {}
+        for key, obj in FileStorage.__objects.items():
+            if key.split('.')[0] == cls_name:
+                filtered[key] = obj
+        return filtered
 
     def new(self, obj):
         """Add new object to storage with class.id key"""
@@ -57,3 +75,14 @@ class FileStorage:
                            .className[key.split('.')[0]](**obj_dict)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj=None):
+        """Delete obj from __objects if it exists.
+
+        If obj is None, do nothing.
+        """
+        if obj is None:
+            return
+        key = '{}.{}'.format(obj.__class__.__name__, getattr(obj, 'id', None))
+        if key in FileStorage.__objects:
+            del FileStorage.__objects[key]
