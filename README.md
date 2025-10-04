@@ -196,6 +196,6 @@ This is an educational project. For contributions:
 
 ##  Author
 
-**Your Name**
-- GitHub: [@your-username](https://github.com/your-username)
+**Kevin Nizeyimana**
+- GitHub: [@k-nizy](https://github.com/k-nizy)
   
