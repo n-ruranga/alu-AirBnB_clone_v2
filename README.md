@@ -196,6 +196,6 @@ This is an educational project. For contributions:
 
 ##  Author
 
-**Kevin Nizeyimana**
-- GitHub: [@k-nizy](https://github.com/k-nizy)
+**NSHUTI JABES**
+- GitHub: [@k-nizy](https://github.com/n-ruranga)
   
