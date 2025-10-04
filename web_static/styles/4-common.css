@@ -5,7 +5,17 @@ body {
     font-size: 14px;
     font-family: Circular,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
+<<<<<<< HEAD
 body .container {
     max-width: 1000px;
     margin: 30px auto;
 }
+=======
+.container {
+    position: relative;
+    max-width: 1000px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin: 0 auto;
+}
+>>>>>>> c5c69c3b281ca80047e1f7969e0cd1ee2d9e23eb
