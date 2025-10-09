@@ -6,11 +6,8 @@ sudo apt-get update -y
 sudo apt-get install -y nginx
 
 # Create necessary directories
-sudo mkdir -p /data/
-sudo mkdir -p /data/web_static/
-sudo mkdir -p /data/web_static/releases/
-sudo mkdir -p /data/web_static/shared/
 sudo mkdir -p /data/web_static/releases/test/
+sudo mkdir -p /data/web_static/shared/
 
 # Create a fake HTML file for testing
 echo "<html>
@@ -21,10 +18,7 @@ echo "<html>
   </body>
 </html>" | sudo tee /data/web_static/releases/test/index.html > /dev/null
 
-# Remove existing symbolic link if it exists
-sudo rm -rf /data/web_static/current
-
-# Create symbolic link
+# Create or recreate symbolic link
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 
 # Give ownership to ubuntu user and group recursively
@@ -38,6 +32,3 @@ fi
 
 # Restart Nginx
 sudo service nginx restart
-
-# Exit successfully
-exit 0
