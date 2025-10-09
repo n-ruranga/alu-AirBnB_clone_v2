@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Sets up a web server for deployment of web_static.
+# Bash script that sets up your web servers for the deployment of web_static
 
-# Update package list and install Nginx if not already installed
-sudo apt-get update
-sudo apt-get -y install nginx
+# Install Nginx if not already installed
+sudo apt-get update -y
+sudo apt-get install -y nginx
 
 # Create necessary directories
 sudo mkdir -p /data/web_static/releases/test/
@@ -18,16 +18,17 @@ echo "<html>
   </body>
 </html>" | sudo tee /data/web_static/releases/test/index.html > /dev/null
 
-# Remove existing symbolic link if it exists and create new one
+# Create or recreate symbolic link
 sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 
 # Give ownership to ubuntu user and group recursively
 sudo chown -R ubuntu:ubuntu /data/
 
-# Update Nginx configuration
-sudo sed -i '/listen 80 default_server;/a\\n\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-available/default
+# Update Nginx configuration to serve content
+# Check if location block already exists to avoid duplicates
+if ! sudo grep -q "location /hbnb_static" /etc/nginx/sites-available/default; then
+    sudo sed -i '/listen 80 default_server;/a \\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-available/default
+fi
 
 # Restart Nginx
 sudo service nginx restart
-
-exit 0

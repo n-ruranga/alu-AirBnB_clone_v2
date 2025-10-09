@@ -1,57 +1,28 @@
 #!/usr/bin/python3
-"""
-Fabric script that distributes an archive to web servers
-"""
+"""Fabric Script that distributes an archives"""
 
-from fabric.api import env, put, run, sudo
-import os
 
-# Define your web servers here
-env.hosts = ['54.157.32.137', '52.55.249.213']
-env.user = 'ubuntu'
-env.key_filename = '~/.ssh/id_rsa'  # Update with your SSH key path
+from fabric.api import put, run, env
+from os.path import exists
+env.hosts = ['54.227.179.101', '3.90.204.71']
 
 
 def do_deploy(archive_path):
-    """
-    Distributes an archive to web servers
-    """
-    if not os.path.exists(archive_path):
+    """Archives to web-servers"""
+    if exists(archive_path) is False:
         return False
-
     try:
-        # Upload the archive to /tmp/ directory
+        file_n = archive_path.split("/")[-1]
+        no_ext = file_n.split(".")[0]
+        path = "/data/web_static/releases/"
         put(archive_path, '/tmp/')
-
-        # Get archive filename without extension
-        archive_filename = os.path.basename(archive_path)
-        folder_name = archive_filename.replace('.tgz', '')
-        folder_path = '/data/web_static/releases/{}/'.format(folder_name)
-
-        # Create target directory
-        run('sudo mkdir -p {}'.format(folder_path))
-
-        # Uncompress archive to target directory
-        run('sudo tar -xzf /tmp/{} -C {}'.format(archive_filename, folder_path))
-
-        # Remove archive from /tmp/
-        run('sudo rm /tmp/{}'.format(archive_filename))
-
-        # Move contents to proper location
-        run('sudo mv {}web_static/* {}'.format(folder_path, folder_path))
-
-        # Remove empty web_static directory
-        run('sudo rm -rf {}web_static'.format(folder_path))
-
-        # Delete existing symbolic link
-        run('sudo rm -rf /data/web_static/current')
-
-        # Create new symbolic link
-        run('sudo ln -s {} /data/web_static/current'.format(folder_path))
-
-        print('New version deployed!')
+        run('mkdir -p {}{}/'.format(path, no_ext))
+        run('tar -xzf /tmp/{} -C {}{}/'.format(file_n, path, no_ext))
+        run('rm /tmp/{}'.format(file_n))
+        run('mv {0}{1}/web_static/* {0}{1}/'.format(path, no_ext))
+        run('rm -rf {}{}/web_static'.format(path, no_ext))
+        run('rm -rf /data/web_static/current')
+        run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
         return True
-
-    except Exception as e:
-        print("Deployment failed: {}".format(str(e)))
+    except:
         return False
